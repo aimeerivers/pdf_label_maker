@@ -14,15 +14,9 @@ module PdfLabelMaker
   end
 
   def self.add_label(row, col, contact, pdf, options)
-    if contact
-      contact.label_lines.each_with_index do |line, idx|
-        label_code = contact.label_code
-        label_code_width = pdf.text_width(label_code)
-        label_text_width = options[:label_width] - (2 * options[:label_padding_x])
-        
-        pdf.add_text(cell_x(col, options) + label_text_width - label_code_width, cell_y(row, options), label_code, options[:font_size])
-        pdf.add_text_wrap(cell_x(col, options), cell_y(row, options) - ((idx + 1) * options[:line_height]), label_text_width, line, options[:font_size])
-      end
+    contact.label_lines.each_with_index do |line, idx|
+      label_text_width = options[:label_width] - (2 * options[:label_padding_x])
+      pdf.add_text_wrap(cell_x(col, options), cell_y(row, options) - (idx * options[:line_height]), label_text_width, line, options[:font_size])
     end
   end
 
@@ -46,7 +40,7 @@ module PdfLabelMaker
     
       0.upto((options[:labels_per_page] / options[:columns]) - 1) do |row|
         0.upto(options[:columns] - 1) do |column|
-          add_label(row, column, addresses_for_page[(row * options[:columns]) +column], pdf, options)
+          add_label(row, column, addresses_for_page[(row * options[:columns]) + column], pdf, options)
         end
       end
     
