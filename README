@@ -1,0 +1,86 @@
+PdfLabelMaker
+=============
+
+Generates PDFs that can print to Avery labels.
+
+Requires pdf-writer (gem install pdf-writer).
+
+
+Example
+=======
+
+Get a collection of contacts and send them to the label maker, with the Avery code of the size labels. For example:
+
+  class ContactsController < ApplicationController
+
+    def index
+      @contacts = Contact.all.ordered
+      respond_to do |format|
+        format.pdf do
+          pdf = PdfLabelMaker.avery_labels(@contacts)
+          send_data pdf.render, :filename => 'labels.pdf', :type => 'application/pdf'
+        end
+        format.html
+      end
+    end
+    
+  end
+
+This would be found at /contacts.pdf
+
+Your model needs to implement a 'label_lines' method which returns an array - one element for each line to appear on the label.
+
+  class Contact < ActiveRecord::Base
+    
+    def label_lines
+      returning Array.new do |arr|
+        arr << full_name
+        address.split("\r\n").each{|line| arr << line}
+      end
+    end
+
+  end
+
+
+Options
+=======
+
+Send the label code that you want printed. Default is 'L7162' which is 16 labels per page.
+
+  pdf = PdfLabelMaker.avery_labels(@contacts, 'J8651')
+
+This would print the J8651 format, which is 65 little labels per page.
+
+Not all label formats are supported yet, but you could send your own if necessary. Just send a bunch of options, like this:
+
+  require 'pdf/writer'
+  include PDF
+  
+  options = {
+    :columns => 5,
+    :labels_per_page => 65,
+    :left_margin => Writer.mm2pts 4,
+    :bottom_margin => Writer.mm2pts 10,
+    :label_width => Writer.mm2pts 38.1,
+    :label_height => Writer.mm2pts 21.2,
+    :label_padding_x => Writer.mm2pts 1,
+    :label_padding_y => Writer.mm2pts 1,
+    :gap_between_labels_x => Writer.mm2pts 3,
+    :font_size =>  6,
+    :line_height =>  7
+  }
+  pdf = PdfLabelMaker.avery_labels(@contacts, 'user-defined', options)
+
+You can also override any of the settings, just like this:
+
+  pdf = PdfLabelMaker.avery_labels(@contacts, 'L7162', {:font_size => 20, :font => 'Times-Roman'})
+
+
+Credit
+======
+
+Thanks to Nick Sieger for the example, and the code that got me started.
+http://blog.nicksieger.com/articles/2006/05/26/rails-is-simpler-than-office
+
+
+Copyright (c) 2008 Aimee Daniells, released under the MIT license
