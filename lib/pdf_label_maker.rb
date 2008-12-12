@@ -14,9 +14,11 @@ module PdfLabelMaker
   end
 
   def self.add_label(row, col, contact, pdf, options)
-    contact.label_lines.each_with_index do |line, idx|
-      label_text_width = options[:label_width] - (2 * options[:label_padding_x])
-      pdf.add_text_wrap(cell_x(col, options), cell_y(row, options) - (idx * options[:line_height]), label_text_width, line, options[:font_size])
+    if contact
+      contact.label_lines.each_with_index do |line, idx|
+        label_text_width = options[:label_width] - (2 * options[:label_padding_x])
+        pdf.add_text_wrap(cell_x(col, options), cell_y(row, options) - (idx * options[:line_height]), label_text_width, line, options[:font_size])
+      end
     end
   end
 
