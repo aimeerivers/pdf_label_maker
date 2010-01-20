@@ -86,7 +86,7 @@ module PdfLabelMaker
       options[:label_height] ||= Writer.mm2pts 29.6
       options[:label_padding_x] ||= Writer.mm2pts 10
       options[:label_padding_y] ||= Writer.mm2pts 4.5
-      options[:gap_between_labels_x] ||= Writer.mm2pts 0.25
+      options[:gap_between_labels_x] ||= Writer.mm2pts 2.5
       options[:font_size] ||= 9
       options[:line_height] ||= 10
     end
